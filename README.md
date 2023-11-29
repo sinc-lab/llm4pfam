@@ -1,8 +1,10 @@
 # Evaluating Large Language Models for annotating proteins
 
-This is the source code for experiments in "Evaluating Large Language Models for annotating proteins,” by R. Vitale, L. Bugnon, E. Fenoy, D.H. Milone, G. Stegmayer (under review) 2023.
+This is the source code for experiments in "Evaluating Large Language Models for annotating proteins,” by R. Vitale, L.A. Bugnon, E. Fenoy, D.H. Milone, G. Stegmayer (under review) 2023.
 
-![TL](https://github.com/RosarioVitale/llm4pfam/assets/141422951/9a6b49e4-250c-4c36-bb9d-3e4c77a293d2)
+<p align="center">
+<img src="abstract.png" alt="abstract">
+</p>
 
 ## Installation
 
@@ -21,9 +23,7 @@ conda activate llm4pfam
 
 ### Requirements
 
-Now on this environment it is better to install pytorch first (it may depend on your hardware setup, follow [these recommendations](https://pytorch.org/get-started/locally/))
-
-Move to the repository folder and install the required packages
+Now on this environment, move to the repository folder and install the required packages
 
 ```
 pip install -r requirements.txt
@@ -35,7 +35,7 @@ pip install -r requirements.txt
 
 Since embedding sequences takes some time, precomputed embeddings are provided. You can download them from [here](https://drive.google.com/drive/folders/1Wp5zzMUES1u4neGqrR2_FAwGylNG7v7h?usp=sharing). Copy and unzip all the files you need on the root folder (`llm4pfam/`). All models require `data/` folder compressed in `data.tar.gz` file. KNN and MLP also need per-protein embeddings, while CNN needs per-residue embeddings.
 
-Embedding files must be in the correct folder. The files (with .npy or .pk extensions) are searched by default in `data/embeddings/` folder. You can create that folder and move the file there or change the embedding folder by passing it as a parameter with:
+Embedding files should be placed in the same folder hierarchy as in the link above. The files (with .npy or .pk extensions) are searched by default in `data/embeddings/` folder. You can change the embedding folder by passing it as a parameter with:
 
 ```
 python [path/to/script.py] --embeddings [path/to/embeddings/folder/]
@@ -57,7 +57,7 @@ To train a MLP model, run the following script:
 python src/mlp/train.py
 ```
 
-Training lasts approximately 1 hour per model. If you want a quick demo you can pass dev partition as train data:
+Training takes approximately 1 hour per model. If you want a quick demo you can pass dev partition as train data:
 
 ```
 python src/mlp/train.py --train dev
@@ -71,7 +71,7 @@ python src/mlp/test.py
 
 ### CNN
 
-We don’t provide per-residue embeddings for train partitions due to the size of the resulting file. Anyway, training lasts approximately 2 days per model. If you want a quick demo you can pass provided dev partition as train data:
+We don’t provide per-residue embeddings for train partitions due to the size of the resulting file. Training lasts approximately 2 days per model. If you want a quick demo you can pass provided dev partition as train data:
 
 ```
 python src/cnn/train.py --train dev
