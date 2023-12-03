@@ -81,9 +81,9 @@ for model, filename in enumerate(models):
                                                np.array(ref)))))
 
     with open(f"{args.res}errors_{model}.csv",'w') as f:
-        for i in tqdm(range(len(ref)),desc="Saving errors",leave=False):
-            if np.array(ref[i])!=np.array(pred_bin[i]):
-                f.write(f"{names[i]},{ref[i]},{pred_bin[i]}\n")
+        f.write("sequence_name,predict,ground_truth\n")
+        for i in tqdm(range(len(ref)),desc="Saving predictions",leave=False):
+            f.write(f"{names[i]},{ref[i]},{pred_bin[i]}\n")
     # k-ensemble score
     pred_avg += pred
 print("\nEnsemble score:")
@@ -93,7 +93,7 @@ print("Error rate:   {0:6.2f}".format((1-a)*100) + "%")
 print("Total errors: {0:6d}".format(sum(1-(np.array(pred_avg_bin)==
                                     np.array(ref)))))
 with open(f"{args.res}errors_ensamble.csv",'w') as f:
-    for i in tqdm(range(len(ref)),desc="Saving errors",leave=False):
-        if np.array(ref[i])!=np.array(pred_avg_bin[i]):
-            f.write(f"{names[i]},{ref[i]},{pred_avg_bin[i]}\n")
+    f.write("sequence_name,predict,ground_truth\n")
+    for i in tqdm(range(len(ref)),desc="Saving predictions",leave=False):
+        f.write(f"{names[i]},{ref[i]},{pred_avg_bin[i]}\n")
 print("\n\nFinished succesfully")

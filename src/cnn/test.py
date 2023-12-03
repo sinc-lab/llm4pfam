@@ -56,7 +56,8 @@ for k, model in enumerate(models):
     net = TLProtCNN(len(categories), device=DEVICE, emb_size=emb_size)
     net.load_state_dict(tr.load(f"{args.mod}{model}"))
     net.eval()
-    _, test_errate, pred, ref, names = net.pred(test_loader)
+    with tr.no_grad():
+        _, test_errate, pred, ref, names = net.pred(test_loader)
 
     pred_bin = tr.argmax(pred, dim=1)
     a = mt.accuracy_score(ref, pred_bin)
@@ -64,10 +65,10 @@ for k, model in enumerate(models):
     print("Total errors: {0:6d}".format(sum(1-(np.array(pred_bin)==
                                                np.array(ref)))))
 
-    with open("{}errors_model_{}.csv".format(args.res,k),'w') as f:
-        for i in tqdm(range(len(ref))):
-            if np.array(pred_bin[i])!=np.array(ref[i]):
-                f.write("{},{},{}\n".format(names[i],pred_bin[i],ref[i]))
+    with open(f"{args.res}predicts_model_{k}.csv",'w') as f:
+        f.write("sequence_name,predict,ground_truth\n")
+        for i in tqdm(range(len(ref)),desc="Saving predictions",leave=False): 
+            f.write(f"{names[i]},{pred_bin[i]},{ref[i]}\n")
 
     # k-ensemble score
     pred_avg += pred
@@ -79,7 +80,7 @@ print("Error rate:   {0:6.2f}".format((1-a)*100) + "%")
 print("Total errors: {0:6d}".format(sum(1-(np.array(pred_avg_bin)==
                                     np.array(ref)))))
 
-with open("{}errors_ensamble.csv".format(args.res),'w') as f:
-    for i in tqdm(range(len(ref))):
-        if np.array(pred_avg_bin[i])!=np.array(ref[i]):
-            f.write("{},{},{}\n".format(names[i],pred_avg_bin[i],ref[i]))
+with open(f"{args.res}predicts_ensamble.csv", 'w') as f:
+    f.write("sequence_name,predict,ground_truth\n")
+    for i in tqdm(range(len(ref)),desc="Saving predictions",leave=False):
+        f.write(f"{names[i]},{pred_avg_bin[i]},{ref[i]}\n")
