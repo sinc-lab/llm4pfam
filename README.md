@@ -2,7 +2,11 @@
 
 This is the source code for experiments in "Evaluating Large Language Models for annotating proteins,” by R. Vitale, L. Bugnon, E. Fenoy, D.H. Milone, G. Stegmayer (under review) 2023.
 
-![TL](https://github.com/RosarioVitale/llm4pfam/assets/141422951/9a6b49e4-250c-4c36-bb9d-3e4c77a293d2)
+![Transfer Learning](TL.jpg)
+
+## Run a demo for reproducing results
+
+If you want to run a quick demo for reproducing the results of the CNN ensemble using ProtTransT5XLU50 embedding, here is a [notebook](https://colab.research.google.com/drive/1WU80RWLJdd5HmVEa8gKLBQyhORR2EQij?usp=sharing).
 
 ## Installation
 
@@ -15,120 +19,96 @@ git clone https://github.com/sinc-lab/llm4pfam.git
 We recommend using a python virtual environment such as conda or venv. For example, with conda:
 
 ```
-conda create -n llm4pfam python
+conda create -n llm4pfam python=3.7
 conda activate llm4pfam
 ```
 
-### Requirements
-
-Now on this environment it is better to install pytorch first (it may depend on your hardware setup, follow [these recommendations](https://pytorch.org/get-started/locally/))
-
-Move to the repository folder and install the required packages
+Now on this environment, move to the repository folder and install the required packages
 
 ```
 pip install -r requirements.txt
 ```
 
-## Run a demo
-
-### Download data
-
-Since embedding sequences takes some time, precomputed embeddings are provided. You can download them from [here](https://drive.google.com/drive/folders/1Wp5zzMUES1u4neGqrR2_FAwGylNG7v7h?usp=sharing). Copy and unzip all the files you need on the root folder (`llm4pfam/`). All models require `data/` folder compressed in `data.tar.gz` file. KNN and MLP also need per-protein embeddings, while CNN needs per-residue embeddings.
-
-Embedding files must be in the correct folder. The files (with .npy or .pk extensions) are searched by default in `data/embeddings/` folder. You can create that folder and move the file there or change the embedding folder by passing it as a parameter with:
+We provide data used in a [drive](https://drive.google.com/drive/folders/1Wp5zzMUES1u4neGqrR2_FAwGylNG7v7h?usp=drive_link) folder. You need to download the `data.tar.gz` file to repository folder and extract its content with
 
 ```
-python [path/to/script.py] --embeddings [path/to/embeddings/folder/]
+tar -xvf data.tar.gz
 ```
 
-### KNN
+The result of this line is `data/` folder, with Pfam data splitted on train, dev and test partitions. Those are in the `clustered/` folder (in a subfolder for partition) and it is required for all methods. The data folder also contains the file `categories.txt`, which lists all families. It is used to define the order of categories in classifiers output. This is required for MLP and CNN methods.
 
-To train and test a KNN model, run the following script:
+## Training  models
 
-```
-python src/knn.py
-```
+### Training KNN
 
-### MLP
+To train and test a KNN model, you need per sequence embeddings for all partitions (train, dev and test). We provide them in the [drive](https://drive.google.com/drive/folders/1Wp5zzMUES1u4neGqrR2_FAwGylNG7v7h?usp=drive_link) folder. Download them for the desired embedding method.
 
-To train a MLP model, run the following script:
+For example, if you want to train and test a KNN using protTransT5XLU50, download all files in `llm4pfam_data/embeddings_per_sequence/protTransT5XLU50/`. Save them in the folder `embeddings/embeddings_per_sequence/protTransT5XLU50/` If you want another embedding method, just download the files from the corresponding folder and put it in the `embeddings/` folder.
 
-```
-python src/mlp/train.py
-```
-
-Training lasts approximately 1 hour per model. If you want a quick demo you can pass dev partition as train data:
+When you have all embeddings, run this script:
 
 ```
-python src/mlp/train.py --train dev
+python src/knn/traintest.py --embeddings embeddings/embeddings_per_sequence/protTransT5XLU50/
 ```
+
+### Training MLP
+
+To train a MLP model, you need the same embeddings for KNN. Follow the instructions of the previous subsection.
+
+Then run the following script to train 5 models:
+
+```
+python src/mlp/train.py -n 5 --embeddings embeddings/embeddings_per_sequence/protTransT5XLU50/
+```
+
+Training takes approximately 1 hour per model. 
 
 To test trained models, run:
 
 ```
-python src/mlp/test.py
+python src/mlp/test.py --embeddings embeddings/embeddings_per_sequence/protTransT5XLU50/
 ```
 
-### CNN
+### Training CNN
 
-We don’t provide per-residue embeddings for train partitions due to the size of the resulting file. Anyway, training lasts approximately 2 days per model. If you want a quick demo you can pass provided dev partition as train data:
+To train a CNN model using ProtTransT5XLU50 embedding, per residue embeddings for train and dev partitions are required. Compute them following instructions in the [Compute embeddings](#compute-embeddings) section.
+
+Once you have all embeddings, run this script to train 5 models:
 
 ```
-python src/cnn/train.py --train dev
+python src/cnn/train.py -n 5 --embeddings embeddings/embeddings_per_residue/protTransT5XLU50/
 ```
+
+Keep in mind that training lasts approximately 2 days per model. 
 
 To test trained models, run:
 
 ```
-python src/cnn/test.py
+python src/cnn/test.py --embeddings embeddings/embeddings_per_residue/protTransT5XLU50/
 ```
 
-## Reproducing results
-
-To reproduce KNN results, follow the same instructions in the previous section. Download embeddings and run the script:
-
-```
-python src/knn.py
-```
-
-To reproduce MLP results, you can download training embeddings provided and train 5 models:
-
-```
-python src/mlp/train.py -n 5
-```
-
-After that, run
-
-```
-python src/mlp/test.py
-```
-
-Using the test script you can see the results for each model individually, and the ensemble with all the trained models found in `models/` folder. You can change this folder by passing it as a parameter.
-
-```
-python src/mlp/test.py --models [path/to/models/]
-```
-
-To reproduce CNN results, compute the embeddings for train sequences following instructions in the next section. Then, run train script:
-
-```
-python src/cnn/train.py -n 5
-```
-
-Finally, run the test script to see the results of each model and the ensemble of models found in `models/` in `result*/` subfolders. You can change models directory with:
-
-```
-python src/cnn/test.py --models [path/to/models/]
-```
+Using the test script you can see the results for each model individually, and the ensemble with all the trained models generated in the `models/` folder. 
 
 ## Compute embeddings
 
-If you want to compute embeddings by yourself, run the corresponding embedding method script from `src/embeddings/`.
+If you want to compute embeddings by yourself, run the corresponding embedding method script from `src/embeddings/`. Keep in mind that computing embeddings processing may take several hours.
 
-For example you can obtain ProtTransT5-XL-U50 per-residue embedding to test one of cnn models running following command:
+For example you can obtain ProtTransT5-XL-U50 per-residue embedding to train one of cnn models running following command:
 
 ```
-python src/embeddings/prottranst5xlu50.py --partition test --per-residue
+python src/embeddings/prottranst5xlu50.py --partition train --per-residue --embeddings data/embeddings/protTransT5XLU50/
+```
+
+For the dev partition:
+
+```
+python src/embeddings/prottranst5xlu50.py --partition dev --per-residue --embeddings data/embeddings/protTransT5XLU50/
+```
+
+For the test partition:
+
+```
+python src/embeddings/prottranst5xlu50.py --partition test --per-residue --embeddings data/embeddings/protTransT5XLU50/
 ```
 
 To compute ProtTrans embeddings you also need [huggingface transformers](https://huggingface.co/docs/transformers/installation) and [sentencepiece](https://pypi.org/project/sentencepiece/).
