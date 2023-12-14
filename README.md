@@ -35,7 +35,7 @@ We provide data used in a [drive](https://drive.google.com/drive/folders/1Wp5zzM
 tar -xvf data.tar.gz
 ```
 
-The result of this line is `data/` folder, with Pfam data splitted on train, dev and test partitions. Those are in the `clustered/` folder (in a subfolder for partition) and it is required for all methods. The data folder also contains the file `categories.txt`, which lists all families. It is used to define the order of categories in classifiers output. This is required for MLP and CNN methods.
+The result of this line is the `data/` folder, with Pfam data splitted on train, dev and test partitions. Those are in the `clustered/` folder (in a subfolder for partition) and it is required for all methods. The data folder also contains the file `categories.txt`, which lists all families. It is used to define the order of categories in classifiers output. This is required for MLP and CNN methods.
 
 ## Training  models
 
@@ -43,7 +43,8 @@ The result of this line is `data/` folder, with Pfam data splitted on train, dev
 
 To train and test a KNN model, you need per sequence embeddings for all partitions (train, dev and test). We provide them in the [drive](https://drive.google.com/drive/folders/1Wp5zzMUES1u4neGqrR2_FAwGylNG7v7h?usp=drive_link) folder. Download them for the desired embedding method.
 
-For example, if you want to train and test a KNN using protTransT5XLU50, download all files in `llm4pfam_data/embeddings_per_sequence/protTransT5XLU50/`. Save them in the folder `embeddings/embeddings_per_sequence/protTransT5XLU50/` If you want another embedding method, just download the files from the corresponding folder and put it in the `embeddings/` folder.
+For example, if you want to train and test a KNN using protTransT5XLU50, download all files from `llm4pfam_data/embeddings_per_sequence/protTransT5XLU50/` to the 
+folder `embeddings/embeddings_per_sequence/protTransT5XLU50`. If you want another embedding method, just download the files from the corresponding folder and put it in the `embeddings/` folder.
 
 When you have all embeddings, run this script:
 
@@ -79,7 +80,7 @@ Once you have all embeddings, run this script to train 5 models:
 python src/cnn/train.py -n 5 --embeddings embeddings/embeddings_per_residue/protTransT5XLU50/
 ```
 
-Keep in mind that training lasts approximately 2 days per model. 
+Keep in mind that training takes approximately 2 days per model. 
 
 To test trained models, run:
 
