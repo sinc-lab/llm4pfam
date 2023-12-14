@@ -6,7 +6,7 @@ This is the source code for experiments in "Evaluating Large Language Models for
 
 ## Run a demo for reproducing results
 
-If you want to run a quick demo for reproducing the results of the CNN ensemble using ProtTransT5XLU50 embedding, here is a [notebook](https://colab.research.google.com/drive/1WU80RWLJdd5HmVEa8gKLBQyhORR2EQij?usp=sharing).
+If you want to run a quick demo for reproducing the results of the CNN ensemble using ProtTransT5XLU50 embedding, here is a [notebook](https://colab.research.google.com/github/sinc-lab/llm4pfam/blob/main/llm4pfam_reproducing_results.ipynb).
 
 ## Installation
 
