@@ -1,6 +1,7 @@
 # Evaluating Large Language Models for annotating proteins
 
-This is the source code for experiments in "Evaluating Large Language Models for annotating proteins,” by R. Vitale, L. Bugnon, E. Fenoy, D.H. Milone, G. Stegmayer (under review) 2023.
+This is the source code for experiments in "Evaluating Large Language Models for annotating proteins,” by R. Vitale, L. Bugnon, E. Fenoy, D.H. Milone, G. Stegmayer, Briefings in Bioinformatics 25(3) 2024
+https://academic.oup.com/bib/article/25/3/bbae177/7665115 
 
 ![Transfer Learning](TL.jpg)
 
